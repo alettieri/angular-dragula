@@ -129,7 +129,12 @@ app.service('peopleService', ['$rootScope', 'dragulaService', function($rootScop
 
   // Bind to the drake 'drop' event
   bag.drake.on('drop', function(){
-    console.dir(service.people);
+    console.log('drake drop event:', service.people);
+  });
+
+  // And... because we can.
+  serviceScope.$on('people-bag.drop', function(){
+    console.log('scope drop event:', service.people);
   });
 
 
