@@ -91,4 +91,46 @@ app.controller('NestedRepeatCtrl', ['$scope',
       console.log(container.scope());
     });
   }
-])
+]);
+
+app.controller('PeopleController', ['peopleService', function(peopleService){
+
+  var vm = this;
+  // Expose the service list of people from the people service
+  vm.people = peopleService.people;
+  // Hand the peopleService scope to the viewmodel
+  vm.peopleScope = peopleService.scope;
+
+}]);
+
+app.service('peopleService', ['$rootScope', 'dragulaService', function($rootScope, dragulaService){
+
+  var service = this;
+
+  // create a new service scope for dragula to bind to
+  var serviceScope = this.scope = $rootScope.$new();
+
+  // List of name objects to expose
+  this.people = [{
+    name: 'Leslie'
+  },{
+    name: 'Sheila'
+  },{
+    name: 'Brad'
+  }];
+
+  // Set the dragula options
+  dragulaService.options(serviceScope, 'people-bag', {
+    revertOnSpill: true
+  });
+
+  // Get the dragula bag for the people bag
+  var bag = dragulaService.find(serviceScope, 'people-bag');
+
+  // Bind to the drake 'drop' event
+  bag.drake.on('drop', function(){
+    console.dir(service.people);
+  });
+
+
+}]);

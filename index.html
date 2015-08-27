@@ -224,7 +224,7 @@ app.controller('WowExampleCtrl', ['$scope', '$timeout',
         <div ng-repeat='text in many' ng-bind='text'></div>
       </div>
       <div class='container' dragula='"another-bag"' dragula-model='many2'>
-        <div ng-repeat='text in many2' ng-bind='text'></div>        
+        <div ng-repeat='text in many2' ng-bind='text'></div>
       </div>
     </div>
     <div class='wrapper'>
@@ -238,7 +238,7 @@ app.controller('WowExampleCtrl', ['$scope', '$timeout',
         &lt;div ng-repeat='text in many' ng-bind='text'&gt;&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class='container' dragula='&quot;another-bag&quot;' dragula-model='many2'&gt;
-        &lt;div ng-repeat='text in many2' ng-bind='text'&gt;&lt;/div&gt;        
+        &lt;div ng-repeat='text in many2' ng-bind='text'&gt;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 
@@ -257,6 +257,15 @@ app.controller('RepeatCtrl', ['$scope', 'dragulaService',
     <div class='wrapper'>
       <div class='container' ng-repeat="group in groups" dragula="'nested-bag'" dragula-scope="$parent">
         <div ng-repeat='item in group.items' ng-bind='item.name'></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="parent" ng-controller="PeopleController as peopleVm">
+    <label for='hy'><strong>Angular-specific example using service scope.</strong></label>
+    <div class="wrapper">
+      <div class="container" dragula="'people-bag'" dragula-model="peopleVm.people" dragula-scope="peopleVm.peopleScope">
+        <div ng-repeat="person in peopleVm.people">{{person.name}}</div>
       </div>
     </div>
   </div>

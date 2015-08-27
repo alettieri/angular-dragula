@@ -5,29 +5,35 @@ var dragulaKey = '$$dragula';
 var replicateEvents = require('./replicate-events');
 
 function register (angular) {
-  return [function dragulaService () {
+
+  function DragulaFactory() {
+
     return {
       add: add,
       find: find,
       options: setOptions,
       destroy: destroy
     };
+
     function handleModels(scope, drake){
       var dragElm;
       var dragIndex;
       var dropIndex;
       var sourceModel;
-      drake.on('remove',function removeModel (el, source) {
+
+      function removeModel (el, source) {
         sourceModel = drake.models[drake.containers.indexOf(source)];
         scope.$applyAsync(function applyRemove() {
           sourceModel.splice(dragIndex, 1);
         });
-      });
-      drake.on('drag',function dragModel (el, source) {
+      }
+
+      function dragModel (el, source) {
         dragElm = el;
         dragIndex = domIndexOf(el, source);
-      });
-      drake.on('drop',function dropModel (dropElm, target, source) {
+      }
+
+      function dropModel (dropElm, target, source) {
         dropIndex = domIndexOf(dropElm, target);
         scope.$applyAsync(function applyDrop() {
           sourceModel = drake.models[drake.containers.indexOf(source)];
@@ -37,7 +43,7 @@ function register (angular) {
             var notCopy = dragElm === dropElm;
             var targetModel = drake.models[drake.containers.indexOf(target)];
             var dropElmModel = notCopy ? sourceModel[dragIndex] : angular.copy(sourceModel[dragIndex]);
-            
+
             if (notCopy) {
               sourceModel.splice(dragIndex, 1);
             }
@@ -45,8 +51,13 @@ function register (angular) {
             target.removeChild(dropElm); // element must be removed for ngRepeat to apply correctly
           }
         });
-      });
+      }
+      
+      drake.on('remove', removeModel);
+      drake.on('drag', dragModel);
+      drake.on('drop', dropModel);
     }
+
     function getOrCreateCtx (scope) {
       var ctx = scope[dragulaKey];
       if (!ctx) {
@@ -56,26 +67,36 @@ function register (angular) {
       }
       return ctx;
     }
+
     function domIndexOf(child, parent) {
       return Array.prototype.indexOf.call(angular.element(parent).children(), child);
     }
+
     function add (scope, name, drake) {
+
       var bag = find(scope, name);
+
       if (bag) {
         throw new Error('Bag named: "' + name + '" already exists in same angular scope.');
       }
+
       var ctx = getOrCreateCtx(scope);
+
       bag = {
         name: name,
         drake: drake
       };
+
       ctx.bags.push(bag);
       replicateEvents(angular, bag, scope);
+
       if(drake.models){ // models to sync with (must have same structure as containers)
         handleModels(scope, drake);
       }
+
       return bag;
     }
+
     function find (scope, name) {
       var bags = getOrCreateCtx(scope).bags;
       for (var i = 0; i < bags.length; i++) {
@@ -84,6 +105,7 @@ function register (angular) {
         }
       }
     }
+
     function destroy (scope, name) {
       var bags = getOrCreateCtx(scope).bags;
       var bag = find(scope, name);
@@ -91,11 +113,15 @@ function register (angular) {
       bags.splice(i, 1);
       bag.drake.destroy();
     }
+
     function setOptions (scope, name, options) {
       var bag = add(scope, name, dragula(options));
       handleModels(scope, bag.drake);
     }
-  }];
+
+  }
+
+  return DragulaFactory;
 }
 
 module.exports = register;
